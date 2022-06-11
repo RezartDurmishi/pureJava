@@ -1,69 +1,113 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.util.Properties;
+import java.util.List;
 
-public class ViewGUI extends JFrame {
+public class ViewGUI extends JFrame implements ActionListener {
 
-    public static String dbms = "mysql";
+    private static final String post = "post";
+    private static final String get = "get";
+    private static String newNote = "";
+    private static Driver driver = new Driver();
+    private static JTextField noteTextField = new JTextField();
+    private static JButton saveBtn;
+    private static JButton viewAllBtn;
 
-    public static void main(String[] args) throws SQLException {
+    public ViewGUI() {
         JFrame frame;
-        JTextField noteTF;
-        JButton saveBtn;
 
         frame = new JFrame();
         frame.setBounds(100, 100, 570, 300);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
-        JLabel addressLbl = new JLabel("Note:");
-        addressLbl.setBounds(83, 97, 51, 16);
-        frame.getContentPane().add(addressLbl);
+        JLabel noteLabel = new JLabel("Note:");
+        noteLabel.setBounds(83, 97, 51, 16);
+        frame.getContentPane().add(noteLabel);
 
-        noteTF = new JTextField();
-        noteTF.setBounds(141, 94, 376, 22);
-        noteTF.setColumns(10);
-        frame.getContentPane().add(noteTF);
+        noteTextField.setBounds(141, 94, 376, 22);
+        noteTextField.setColumns(10);
+        frame.getContentPane().add(noteTextField);
 
         saveBtn = new JButton("Save");
-        saveBtn.setFont(new Font("Tahoma", Font.BOLD, 13));
-        saveBtn.setBounds(200, 208, 166, 25);
+        saveBtn.setFont(new Font("Helvetica", Font.BOLD, 13));
+        saveBtn.setBounds(150, 208, 120, 25);
         frame.getContentPane().add(saveBtn);
+        //if noteTextField = "" , return Dialog "You can't save an empty note."
+        saveBtn.addActionListener(this);
 
-        frame.setLocationRelativeTo(null);
+        viewAllBtn = new JButton("View All");
+        viewAllBtn.setFont(new Font("Helvetica", Font.BOLD, 13));
+        viewAllBtn.setBounds(300, 208, 120, 25);
+        frame.getContentPane().add(viewAllBtn);
+        viewAllBtn.addActionListener(this);
+
         frame.setResizable(false);
         frame.setTitle("Add new note");
         frame.setVisible(true);
-
-        Connection connection = getConnection();
     }
 
-    static Connection getConnection() throws SQLException {
+    public static void main(String[] args) {
+        new ViewGUI();
+    }
 
-        Connection conn = null;
-        Properties connectionProps = new Properties();
-        connectionProps.put("user", "root");
-        connectionProps.put("password", "");
-//        DriverManager.registerDriver(new com.mysql.jdbc.Driver ());
-
-
-        if (dbms.equals("mysql")) {
-            conn = DriverManager.getConnection(
-                    "jdbc:" + dbms + "://" +
-                            "localhost" +
-                            ":" + "3306" + "/",
-                    connectionProps);
-        } else if (dbms.equals("derby")) {
-            conn = DriverManager.getConnection(
-                    "jdbc:" + dbms + ":" +
-                            "testDatabase" +
-                            ";create=true",
-                    connectionProps);
+    /*
+     * On button click
+     */
+    @Override
+    public void actionPerformed(ActionEvent event) {
+        if (event.getSource() == saveBtn) {
+            newNote = noteTextField.getText();
+            String createQuery = "insert into notes (note) values('" + newNote + "')";
+            try {
+                driver.executeQuery(createQuery, post);
+                noteTextField.setText("");
+                // add dialog box  "Note saved";
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
-        System.out.println("Connected to database");
-        return conn;
+
+        if (event.getSource() == viewAllBtn) {
+            String getAllQuery = "select * from notes";
+            try {
+                List<String> allNotes = driver.executeQuery(getAllQuery, get);
+                final Object[][] rowData = {};
+                final Object[] columnNames = {"Notes"};
+
+                DefaultTableModel listTableModel = new DefaultTableModel(rowData, columnNames);
+                allNotes.forEach(note->{
+                    listTableModel.addRow(new Object[]{note});
+                });
+
+                JFrame f;
+                // Table
+                JTable j;
+
+                // Frame initialization
+                f = new JFrame();
+
+                // Frame Title
+                f.setTitle("Notes");
+
+                // Initializing the JTable
+                j = new JTable(listTableModel);
+                j.setBounds(30, 40, 200, 300);
+
+                // adding it to JScrollPane
+                JScrollPane sp = new JScrollPane(j);
+                f.add(sp);
+                // Frame Size
+                f.setSize(500, 200);
+                // Frame Visible = true
+                f.setVisible(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 }

@@ -1,40 +1,57 @@
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Driver {
-    public static void main(String[] args) throws SQLException {
-        Connection myConn = null;
-        Statement myStmt = null;
-        ResultSet myRs = null;
+    public List<String> executeQuery(String query, String method) throws SQLException {
+        String url = "jdbc:mysql://localhost:3306/testdatabase";
+        String user = "root";
+        String password = "1234";
+
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        List<String> notes = new ArrayList<>();
 
         try {
             // 1. Get a connection to database
-            myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/testdatabase", "root", "1234");
+            connection = DriverManager.getConnection(url, user, password);
 
             // 2. Create a statement
-            myStmt = myConn.createStatement();
+            statement = connection.createStatement();
 
             // 3. Execute SQL query
-            myRs = myStmt.executeQuery("select * from notes");
-
-            // 4. Process the result set
-            while (myRs.next()) {
-                System.out.println(myRs.getString("note"));
+            if (method.equals("post")){
+                statement.executeUpdate(query);
+                System.out.println("Note inserted.");
             }
-        } catch (Exception exc) {
-            exc.printStackTrace();
+
+            if (method.equals("get")){
+                resultSet = statement.executeQuery(query);
+
+                // 4. Process the result set
+                while (resultSet.next()) {
+                    System.out.println(resultSet.getString("note"));
+                    notes.add(resultSet.getString("note"));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
-            if (myRs != null) {
-                myRs.close();
+            if (resultSet != null) {
+                resultSet.close();
             }
 
-            if (myStmt != null) {
-                myStmt.close();
+            if (statement != null) {
+                statement.close();
             }
 
-            if (myConn != null) {
-                myConn.close();
+            if (connection != null) {
+                connection.close();
             }
         }
+        return notes;
     }
 }
 
