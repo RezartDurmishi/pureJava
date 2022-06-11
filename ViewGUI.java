@@ -47,6 +47,7 @@ public class ViewGUI extends JFrame implements ActionListener {
 
         frame.setResizable(false);
         frame.setTitle("Add new note");
+//        frame.getContentPane().setBackground(new Color(243, 161, 56));
         frame.setVisible(true);
     }
 
@@ -83,27 +84,28 @@ public class ViewGUI extends JFrame implements ActionListener {
                     listTableModel.addRow(new Object[]{note});
                 });
 
-                JFrame f;
+                JFrame frame;
                 // Table
-                JTable j;
+                JTable table;
 
                 // Frame initialization
-                f = new JFrame();
+                frame = new JFrame();
+//                frame.getContentPane().setBackground(new Color(243, 161, 56));
 
                 // Frame Title
-                f.setTitle("Notes");
+                frame.setTitle("Notes");
 
                 // Initializing the JTable
-                j = new JTable(listTableModel);
-                j.setBounds(30, 40, 200, 300);
+                table = new JTable(listTableModel);
+                table.setBounds(30, 40, 200, 300);
 
                 // adding it to JScrollPane
-                JScrollPane sp = new JScrollPane(j);
-                f.add(sp);
+                JScrollPane scrollPane = new JScrollPane(table);
+                frame.add(scrollPane);
                 // Frame Size
-                f.setSize(500, 200);
+                frame.setSize(500, 200);
                 // Frame Visible = true
-                f.setVisible(true);
+                frame.setVisible(true);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
