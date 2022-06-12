@@ -1,10 +1,8 @@
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.util.List;
 
 public class ViewGUI extends JFrame implements ActionListener {
     private static JTextArea noteText;
@@ -56,11 +54,13 @@ public class ViewGUI extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent event) {
         Driver driver = new Driver();
+        String newNote = noteText.getText();
+
         if (event.getSource() == saveBtn) {
-            String newNote = noteText.getText();
-            if (newNote.equals("")) {
+            if (newNote.isBlank()) {
                 JOptionPane.showMessageDialog(new JFrame(), "You can't save an empty note!",
                         "Warning", JOptionPane.ERROR_MESSAGE);
+                noteText.setText("");
                 return;
             }
             newNote = newNote.replaceAll("'", "''");  //todo: use of regex
@@ -75,42 +75,7 @@ public class ViewGUI extends JFrame implements ActionListener {
         }
 
         if (event.getSource() == viewAllBtn) {
-            String getAllQuery = "select * from notes";
-            try {
-                List<String> allNotes = driver.executeQuery(getAllQuery, "select");
-                final Object[][] rowData = {};
-                final Object[] columnNames = {"Notes"};
-
-                DefaultTableModel listTableModel = new DefaultTableModel(rowData, columnNames);
-                allNotes.forEach(note -> {
-                    listTableModel.addRow(new Object[]{note});
-                });
-
-                JFrame frame;
-                // Table
-                JTable table;
-
-                // Frame initialization
-                frame = new JFrame();
-
-                // Initializing the JTable
-                table = new JTable(listTableModel);
-                table.setBounds(30, 40, 200, 300);
-
-                // adding it to JScrollPane
-                JScrollPane scrollPane = new JScrollPane(table);
-                frame.add(scrollPane);
-
-                // Frame Size
-                frame.setSize(500, 300);
-
-                // Frame Visible = true
-                frame.setVisible(true);
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
+            new AllNotesGUI();
         }
     }
 }
