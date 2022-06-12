@@ -4,24 +4,22 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class AllNotesGUI extends JFrame {
-    private static Driver driver = new Driver();
+
+    Driver driver = new Driver();
+    String getAllQuery = "select * from notes";
+    List<String> allNotes = null; //generic collection
+    final Object[][] rowData = {};
+    final Object[] columnNames = {"Notes"};
 
     AllNotesGUI() {
-        String getAllQuery = "select * from notes";
-        List<String> allNotes = null;
         try {
             allNotes = driver.executeQuery(getAllQuery, "select");
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        final Object[][] rowData = {};
-        final Object[] columnNames = {"Notes"};
-
         DefaultTableModel tableModel = new DefaultTableModel(rowData, columnNames);
-        allNotes.forEach(note -> {
-            tableModel.addRow(new Object[]{note});
-        });
+        allNotes.forEach(note -> tableModel.addRow(new Object[]{note})); //lambda expression & generic method
 
         // Frame initialization
         JFrame frame = new JFrame();
