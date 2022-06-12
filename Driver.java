@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Driver {
-    public List<String> executeQuery(String query, String method) throws SQLException {
+    public List<String> executeQuery(String query, String queryType) throws SQLException {
         String url = "jdbc:mysql://localhost:3306/testdatabase";
         String user = "root";
         String password = "1234";
@@ -21,17 +21,15 @@ public class Driver {
             statement = connection.createStatement();
 
             // 3. Execute SQL query
-            if (method.equals("post")){
+            if (queryType.equals("insert")){
                 statement.executeUpdate(query);
-                System.out.println("Note inserted.");
             }
 
-            if (method.equals("get")){
+            if (queryType.equals("select")){
                 resultSet = statement.executeQuery(query);
 
                 // 4. Process the result set
                 while (resultSet.next()) {
-                    System.out.println(resultSet.getString("note"));
                     notes.add(resultSet.getString("note"));
                 }
             }
