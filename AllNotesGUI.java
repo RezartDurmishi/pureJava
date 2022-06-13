@@ -11,6 +11,7 @@ public class AllNotesGUI extends JFrame {
     final Object[][] rowData = {};
     final Object[] columnNames = {"Notes"};
 
+    //constructor
     AllNotesGUI() {
         try {
             allNotes = driver.executeQuery(getAllQuery, "select");
@@ -27,9 +28,7 @@ public class AllNotesGUI extends JFrame {
         // Initializing the JTable
         JTable table = new JTable(tableModel);
 
-//        table.getColumn("Modify").setMaxWidth(70);
         table.setBounds(30, 40, 200, 300);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 
         // adding it to JScrollPane
         JScrollPane scrollPane = new JScrollPane(table);
